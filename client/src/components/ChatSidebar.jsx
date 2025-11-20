@@ -11,6 +11,7 @@ import {
   ModalFooter,
 } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
+import { useSocket } from "../context/SocketContext";
 
 export default function ChatSidebar() {
   const setSelectedUser = useMessageStore((s) => s.setSelectedUser);
@@ -18,6 +19,7 @@ export default function ChatSidebar() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const socket = useSocket();
 
   const [users, setUsers] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -30,6 +32,17 @@ export default function ChatSidebar() {
     const res = await api.get("/user/list");
     setUsers(res.data.data);
   };
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("new_user", (data) => {
+      fetchUsers();
+    });
+
+    return () => {
+      socket.off("new_user");
+    };
+  }, [socket]);
 
   const handleLogout = () => {
     setOpenModal(false);
@@ -100,7 +113,9 @@ export default function ChatSidebar() {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleLogout} color="red">Logout</Button>
+          <Button onClick={handleLogout} color="red">
+            Logout
+          </Button>
         </ModalFooter>
       </Modal>
     </div>

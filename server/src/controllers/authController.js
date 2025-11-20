@@ -3,7 +3,8 @@ const authService = require("../services/authService");
 const register = async (req, res) => {
   try {
     const rb = req.body;
-    const result = await authService.register(rb);
+    const io = req.app.get("io");
+    const result = await authService.register(rb, io);
 
     if (!result.success) {
       return res.status(400).json({ success: false, message: result.message });
@@ -60,7 +61,7 @@ const profile = async (req, res) => {
 
 const getAllUser = async (req, res) => {
   try {
-    const userId= req.user.id
+    const userId = req.user.id;
     const result = await authService.getAllUser(userId);
 
     if (!result.success) {

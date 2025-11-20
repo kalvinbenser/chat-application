@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/userModel");
 
-const register = async (payload) => {
+const register = async (payload, io) => {
   try {
     const { name, email, password } = payload;
 
@@ -22,6 +22,8 @@ const register = async (payload) => {
       email,
       password: hashedPassword,
     });
+    
+    io.emit("new_user", {});
 
     return {
       success: true,
